@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="JutiLabs">
+  <rect width="64" height="64" rx="14" fill="#09264A"/>
+  <path d="M 25 4 L 44 4 L 44 26 L 35 36 L 44 36 L 29 48 L 38 48 L 10 62 L 21 49 L 13 49 L 28 37 L 19 37 L 34 26 L 34 12 L 25 12 Z"
+    fill="#FFBF00" stroke="#0d1117" stroke-width="2" stroke-linejoin="miter" stroke-miterlimit="8"/>
+</svg>
