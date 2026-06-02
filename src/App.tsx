@@ -383,14 +383,14 @@ export default function App() {
     <div className="min-h-screen">
       {/* HEADER */}
       <header className="sticky top-0 z-50 border-b border-white/10 bg-ink/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-content items-center justify-between px-5 py-4 md:px-8">
-          <a href="#top" className="font-display text-lg font-bold tracking-tight text-white">Tomás Muñoz</a>
-          <nav className="flex items-center gap-4 text-sm text-white/60 sm:gap-5">
-            <a href="#work" className="transition-colors hover:text-white">{t.nav.work}</a>
+        <div className="mx-auto flex max-w-content items-center justify-between gap-3 px-4 py-4 md:px-8">
+          <a href="#top" className="font-display text-base font-bold tracking-tight text-white sm:text-lg">Tomás Muñoz</a>
+          <nav className="flex items-center gap-3 text-sm text-white/60 sm:gap-5">
+            <a href="#work" className="hidden transition-colors hover:text-white sm:inline">{t.nav.work}</a>
             <a href={GITHUB} target="_blank" rel="noreferrer" className="hidden transition-colors hover:text-white sm:inline">GitHub</a>
             <a href={LINKEDIN} target="_blank" rel="noreferrer" className="hidden transition-colors hover:text-white sm:inline">LinkedIn</a>
             <a href="#contact" className="rounded-lg border border-white/15 px-3 py-1.5 font-medium text-white transition-colors hover:border-amber hover:text-amber">{t.nav.contact}</a>
-            <div className="flex items-center gap-1 pl-1 text-sm font-semibold" role="group" aria-label="Language">
+            <div className="flex items-center gap-1.5 pl-0.5 text-sm font-semibold" role="group" aria-label="Language">
               <button type="button" onClick={() => setLang('en')} aria-pressed={lang === 'en'}
                 className={lang === 'en' ? 'text-amber' : 'text-white/40 hover:text-white'}>EN</button>
               <span className="text-white/25">|</span>
