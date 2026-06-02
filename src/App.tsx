@@ -120,12 +120,28 @@ const ArrowOut = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0"><path d="M7 17 17 7M9 7h8v8" /></svg>
 );
 
-// ── ProjectCard — problem + "What I built" bullet list + result + stack + media ──
+// ── Bullet list ──
+function Bullets({ items }: { items: string[] }) {
+  return (
+    <ul className="space-y-2.5">
+      {items.map((b) => (
+        <li key={b} className="flex gap-3 leading-relaxed text-white/70">
+          <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-amber/70" />
+          <span>{b}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+type Group = { label: string; bullets: string[] };
+
+// ── ProjectCard — problem + "What I built" bullet list (or grouped) + result + stack + media ──
 function ProjectCard({
-  name, tag, featured, problem, lead, bullets, note, result, stack, children,
+  name, tag, featured, problem, lead, bullets, groups, note, result, stack, children,
 }: {
   name: string; tag: string; featured?: boolean;
-  problem?: string; lead: string; bullets: string[]; note?: string; result: string; stack: string;
+  problem?: string; lead: string; bullets?: string[]; groups?: Group[]; note?: string; result: string; stack: string;
   children: React.ReactNode;
 }) {
   return (
@@ -140,16 +156,15 @@ function ProjectCard({
         {problem && (
           <p className="leading-relaxed text-white/70"><span className="font-semibold text-white/90">The problem: </span>{problem}</p>
         )}
-        <div>
+        <div className="space-y-4">
           <p className="leading-relaxed text-white/80"><span className="font-semibold text-white">What I built — </span>{lead}</p>
-          <ul className="mt-4 space-y-2.5">
-            {bullets.map((b) => (
-              <li key={b} className="flex gap-3 leading-relaxed text-white/70">
-                <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-amber/70" />
-                <span>{b}</span>
-              </li>
-            ))}
-          </ul>
+          {bullets && <Bullets items={bullets} />}
+          {groups && groups.map((g) => (
+            <div key={g.label} className="space-y-2.5">
+              <p className="text-sm font-semibold italic text-amber/90">{g.label}</p>
+              <Bullets items={g.bullets} />
+            </div>
+          ))}
         </div>
         {note && <p className="text-sm text-white/45">{note}</p>}
         <p className="leading-relaxed"><span className="font-semibold text-white/90">Result — </span><span className="text-white/90">{result}</span></p>
@@ -302,48 +317,49 @@ export default function App() {
               </div>
             </ProjectCard>
 
-            {/* ── DUENDES PERÚ ── */}
+            {/* ── DUENDES PERÚ (store + catalog bot + daily content) ── */}
             <ProjectCard
-              name="Duendes Perú" tag="e-commerce"
+              name="Duendes Perú" tag="e-commerce + content automation"
               problem="a handmade-goods brand needed an online store and a way to manage a growing catalog without touching code."
-              lead="a custom online store plus a Telegram bot that runs the whole catalog from a chat:"
-              bullets={[
-                'Custom Shopify storefront, with checkout through WhatsApp.',
-                'A Telegram bot that manages the catalog end to end: add a product, edit its price or stock, activate or deactivate it, and list or search what\'s in the store.',
-                'Mark an item as "sold outside the store" so stock stays accurate.',
-                'Automatic sale notifications — the bot tells the owner the moment something sells (via webhook).',
-                'Turns a product photo into a finished listing: GPT-4o mini reads each photo and auto-writes its description.',
-                'I also used Claude Code to push changes straight to the live store.',
+              lead="I ran this client's whole digital operation: a custom store, a catalog bot, and a daily content automation."
+              groups={[
+                {
+                  label: 'Store + catalog bot:',
+                  bullets: [
+                    'Custom Shopify storefront, with checkout through WhatsApp.',
+                    'A Telegram bot that manages the catalog end to end: add a product, edit its price or stock, activate or deactivate it, and list or search what\'s in the store.',
+                    'Mark an item as "sold outside the store" so stock stays accurate.',
+                    'Automatic sale notifications — the bot tells the owner the moment something sells (via webhook).',
+                    'Turns a product photo into a finished listing: GPT-4o mini reads each photo and auto-writes its description.',
+                    'I also used Claude Code to push changes straight to the live store.',
+                  ],
+                },
+                {
+                  label: 'Daily content automation (Oráculo):',
+                  bullets: [
+                    'An automated daily message the brand sends its community every morning on Telegram — generated and delivered with no one lifting a finger.',
+                    'Two scheduled automations: one prepares the content at 3am, another sends it at 9am.',
+                    'Generates a personalized daily reading with AI (Gemini) on top of a structured data table.',
+                  ],
+                },
               ]}
-              result="they publish and manage their whole catalog in minutes, from their phone, without touching code."
-              stack="Shopify Admin API · Telegram · GPT-4o mini · Claude Code"
+              result="they manage their whole catalog in minutes from their phone — and the community gets a daily message automatically, every day."
+              stack="Shopify Admin API · Telegram · GPT-4o mini · Gemini · n8n · Claude Code"
             >
-              <div className="grid items-start gap-8 lg:grid-cols-2">
+              <div className="space-y-10">
                 <Wide src="/img/duendes/store.png" alt="Duendes Perú — custom Shopify storefront" onZoom={zoom} caption="Custom Shopify storefront, built with Claude Code" />
-                <figure className="mx-auto w-full max-w-[640px]">
-                  <div className="overflow-hidden rounded-xl border border-white/10 bg-panel p-2">
-                    <video controls playsInline preload="metadata" className="block aspect-video w-full rounded-md bg-black object-contain">
-                      <source src="/media/duendesperu.mp4" type="video/mp4" />
-                    </video>
-                  </div>
-                  <Caption>Telegram catalog bot — product live in under a minute</Caption>
-                </figure>
+                <div className="grid grid-cols-1 justify-items-center gap-8 sm:grid-cols-2">
+                  <figure className="mx-auto w-full max-w-[330px]">
+                    <div className="overflow-hidden rounded-[2rem] border-[6px] border-[#16181d] bg-[#16181d] shadow-2xl ring-1 ring-white/10">
+                      <video controls playsInline preload="metadata" className="block w-full rounded-[1.4rem]">
+                        <source src="/media/duendesperu.mp4" type="video/mp4" />
+                      </video>
+                    </div>
+                    <Caption>Catalog bot in action — a product live in under a minute (Telegram → Shopify)</Caption>
+                  </figure>
+                  <Phone src="/img/duendes/telegram.png" alt="Duendes Perú — daily Telegram message (Oráculo)" onZoom={zoom} caption="Daily content automation — the message delivered every morning" />
+                </div>
               </div>
-            </ProjectCard>
-
-            {/* ── ORÁCULO DIARIO ── */}
-            <ProjectCard
-              name="Oráculo Diario" tag="automated daily content · same client"
-              lead="an automated daily message the brand sends its community every morning on Telegram, generated and delivered without anyone lifting a finger:"
-              bullets={[
-                'Two scheduled automations: one prepares the content at 3am, another sends it at 9am.',
-                'Generates a personalized daily reading using AI (Gemini) on top of a structured data table.',
-                'Delivers it automatically to the audience on Telegram, every day.',
-              ]}
-              result="a hands-off daily touchpoint with the community — content that used to be manual now runs on schedule, on its own."
-              stack="n8n · Gemini · Telegram"
-            >
-              <Phone src="/img/oraculo/telegram.png" alt="Oráculo Diario — daily Telegram message" onZoom={zoom} caption="The daily Telegram message, delivered automatically every morning" />
             </ProjectCard>
           </div>
         </section>
