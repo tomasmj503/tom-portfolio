@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>La Braza · Panel de Pedidos (Demo)</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#08080a; --surface:#111114; --surface-2:#1a1a1e; --border:#252529;
+    --text:#e8e8ec; --text-muted:#7a7a84; --text-dim:#55555e;
+    --accent:#f97316; --accent-glow:rgba(249,115,22,.12);
+    --confirmed:#f59e0b; --confirmed-bg:rgba(245,158,11,.07); --confirmed-border:rgba(245,158,11,.22);
+    --preparing:#3b82f6; --preparing-bg:rgba(59,130,246,.07); --preparing-border:rgba(59,130,246,.22);
+    --ready:#10b981; --ready-bg:rgba(16,185,129,.07); --ready-border:rgba(16,185,129,.22);
+    --dispatched:#8b5cf6; --dispatched-bg:rgba(139,92,246,.07); --dispatched-border:rgba(139,92,246,.22);
+    --delivered:#6b7280; --delivered-bg:rgba(107,114,128,.05); --delivered-border:rgba(107,114,128,.12);
+    --cancelled:#ef4444;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+  /* ── LOGIN (cosmético, sin backend) ── */
+  .login{position:fixed;inset:0;z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(50rem 36rem at 70% -10%,rgba(249,115,22,.10),transparent 60%),var(--bg);padding:20px}
+  .login-logo{font-family:'Space Mono',monospace;font-size:13px;color:var(--accent);letter-spacing:3px;text-transform:uppercase;margin-bottom:6px}
+  .login-name{font-size:26px;font-weight:700;margin-bottom:6px}
+  .login-sub{font-size:13px;color:var(--text-muted);margin-bottom:26px}
+  .login-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;width:100%;max-width:340px;text-align:center}
+  .login-banner{background:var(--accent-glow);border:1px solid var(--accent-border,rgba(249,115,22,.3));border-radius:8px;padding:8px 12px;font-size:12px;color:var(--accent);font-weight:600;margin-bottom:16px}
+  .login-input{width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:12px;color:var(--text);font-size:18px;text-align:center;letter-spacing:6px;font-family:'Space Mono',monospace}
+  .login-input:focus{outline:none;border-color:var(--accent)}
+  .login-btn{width:100%;margin-top:12px;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:.5px}
+  .login-btn:hover{filter:brightness(1.08)}
+  .login-err{color:var(--cancelled);font-size:12px;margin-top:10px;min-height:16px}
+
+  .header{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
+  .header-left{display:flex;align-items:center;gap:12px}
+  .logo{font-family:'Space Mono',monospace;font-size:12px;color:var(--accent);letter-spacing:2px;text-transform:uppercase}
+  .restaurant-name{font-size:15px;font-weight:600}
+  .header-right{display:flex;align-items:center;gap:10px}
+  .live-dot{width:7px;height:7px;background:#10b981;border-radius:50%;animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(16,185,129,.4)}50%{opacity:.8;box-shadow:0 0 0 5px rgba(16,185,129,0)}}
+  .live-text{font-size:11px;color:#10b981;font-weight:500}
+  .demo-pill{font-size:10px;color:var(--accent);border:1px solid var(--accent-border,rgba(249,115,22,.3));background:var(--accent-glow);border-radius:5px;padding:3px 8px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+
+  .date-bar{display:flex;align-items:center;gap:8px;padding:10px 20px;border-bottom:1px solid var(--border);background:var(--surface);flex-wrap:wrap}
+  .date-btn{background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:5px 12px;color:var(--text-muted);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s}
+  .date-btn:hover{border-color:var(--text-muted);color:var(--text)}
+  .date-btn.active{background:var(--accent-glow);border-color:var(--accent);color:var(--accent)}
+
+  .stats-bar{display:flex;gap:8px;padding:10px 20px;border-bottom:1px solid var(--border);overflow-x:auto}
+  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 14px;min-width:108px;flex-shrink:0}
+  .stat-value{font-size:22px;font-weight:700;font-family:'Space Mono',monospace}
+  .stat-label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.8px;margin-top:1px}
+
+  .filter-bar{display:flex;gap:6px;padding:10px 20px;flex-wrap:wrap}
+  .filter-btn{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:5px 12px;color:var(--text-muted);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s}
+  .filter-btn:hover{border-color:var(--text-muted);color:var(--text)}
+  .filter-btn.active{background:var(--accent-glow);border-color:var(--accent);color:var(--accent)}
+  .filter-count{background:var(--surface-2);border-radius:3px;padding:0 5px;font-size:10px;margin-left:4px}
+  .filter-btn.active .filter-count{background:rgba(249,115,22,.2)}
+
+  .orders-container{padding:12px 20px 40px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+
+  .order-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:all .2s;animation:slideIn .25s ease-out}
+  @keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  .order-card.status-confirmed{border-left:3px solid var(--confirmed)}
+  .order-card.status-preparing{border-left:3px solid var(--preparing)}
+  .order-card.status-ready{border-left:3px solid var(--ready)}
+  .order-card.status-dispatched{border-left:3px solid var(--dispatched)}
+  .order-card.status-delivered{border-left:3px solid var(--delivered);opacity:.55}
+  .order-card.status-cancelled{border-left:3px solid var(--cancelled);opacity:.4}
+
+  .card-top{padding:8px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+  .card-top-left{display:flex;align-items:center;gap:6px}
+  .order-status-badge{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;padding:3px 8px;border-radius:4px}
+  .badge-confirmed{background:var(--confirmed-bg);color:var(--confirmed);border:1px solid var(--confirmed-border)}
+  .badge-preparing{background:var(--preparing-bg);color:var(--preparing);border:1px solid var(--preparing-border)}
+  .badge-ready{background:var(--ready-bg);color:var(--ready);border:1px solid var(--ready-border)}
+  .badge-dispatched{background:var(--dispatched-bg);color:var(--dispatched);border:1px solid var(--dispatched-border)}
+  .badge-delivered{background:var(--delivered-bg);color:var(--delivered);border:1px solid var(--delivered-border)}
+  .order-type-badge{font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px}
+  .type-delivery{background:rgba(59,130,246,.1);color:#60a5fa}
+  .type-pickup{background:rgba(16,185,129,.1);color:#34d399}
+  .card-time-ago{font-size:10px;color:var(--text-dim);font-family:'Space Mono',monospace}
+
+  .card-body{padding:8px 10px}
+  .card-item{display:flex;justify-content:space-between;padding:2px 0;font-size:13px}
+  .card-item-q{color:var(--text-muted)}
+  .card-total{display:flex;justify-content:space-between;padding:5px 0 0;margin-top:4px;border-top:1px solid var(--border);font-weight:600;font-size:13px}
+  .card-total-amount{font-family:'Space Mono',monospace;color:var(--accent)}
+  .card-payment{font-size:11px;color:var(--text-muted);margin-top:6px;padding:2px 6px;background:var(--surface-2);border-radius:4px;display:inline-block}
+
+  .card-footer{padding:6px 10px;border-top:1px solid var(--border)}
+  .card-customer-name{font-size:12px;font-weight:500}
+  .card-customer-phone{color:var(--text-muted);font-size:11px}
+  .card-address{font-size:11px;color:var(--text-muted);margin-top:2px}
+
+  .card-actions{padding:6px 10px;border-top:1px solid var(--border);display:flex;gap:6px}
+  .action-btn{flex:1;padding:10px;border:none;border-radius:7px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;text-transform:uppercase;letter-spacing:.5px}
+  .action-btn:hover{transform:translateY(-1px);filter:brightness(1.1)}
+  .btn-prepare{background:var(--preparing);color:#fff}
+  .btn-ready{background:var(--ready);color:#fff}
+  .btn-dispatch{background:var(--dispatched);color:#fff}
+  .btn-deliver{background:var(--delivered);color:#fff}
+  .card-done{padding:8px 10px;border-top:1px solid var(--border);font-size:11px;color:var(--text-dim);text-align:center}
+
+  .empty-state{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--text-muted)}
+  .empty-icon{font-size:40px;margin-bottom:12px}
+
+  @media(max-width:768px){
+    .orders-container{grid-template-columns:1fr;padding:8px 12px 24px}
+    .header,.stats-bar,.filter-bar,.date-bar{padding-left:12px;padding-right:12px}
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN cosmético -->
+<div class="login" id="login">
+  <div class="login-logo">JUTILABS</div>
+  <div class="login-name">La Braza</div>
+  <div class="login-sub">Panel de Pedidos</div>
+  <div class="login-card">
+    <div class="login-banner">Demo · clave de acceso: 1111</div>
+    <input class="login-input" id="pin" type="password" inputmode="numeric" maxlength="8" placeholder="••••" autocomplete="off" />
+    <button class="login-btn" id="enter">Entrar</button>
+    <div class="login-err" id="err"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none">
+  <div class="header">
+    <div class="header-left">
+      <span class="logo">JUTILABS</span>
+      <span class="restaurant-name">La Braza — Panel de Pedidos</span>
+    </div>
+    <div class="header-right">
+      <span class="demo-pill">Demo</span>
+      <span class="live-dot"></span><span class="live-text">En vivo</span>
+    </div>
+  </div>
+  <div class="date-bar" id="dateBar"></div>
+  <div class="stats-bar" id="statsBar"></div>
+  <div class="filter-bar" id="filterBar"></div>
+  <div class="orders-container" id="orders"></div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   DEMO 100% ESTÁTICO — sin Supabase, sin red, sin localStorage.
+   Al recargar, vuelve al mes fijo (los datos se regeneran igual).
+   ════════════════════════════════════════════════════════════ */
+
+// "Ahora" fijo del demo (no usa la fecha real del navegador para los cálculos).
+const DEMO_NOW = new Date(2026, 5, 20, 14, 32, 0); // 20 jun 2026, 2:32 p.m.
+
+// PRNG con semilla fija → mismo mes en cada recarga.
+let _seed = 20260620;
+function rnd(){ _seed = (_seed * 1103515245 + 12345) & 0x7fffffff; return _seed / 0x7fffffff; }
+function pick(a){ return a[Math.floor(rnd()*a.length)]; }
+function ri(lo,hi){ return lo + Math.floor(rnd()*(hi-lo+1)); }
+
+const MENU = [
+  {n:'Pollo a la Brasa (Entero)', p:59.90},
+  {n:'Pollo a la Brasa (1/2)', p:32.00},
+  {n:'Pollo Broaster (2 pzs)', p:18.00},
+  {n:'Mostrito', p:24.00},
+  {n:'Alitas BBQ (6 pzs)', p:24.90},
+  {n:'Salchipapa', p:14.00},
+  {n:'Mollejitas', p:15.00},
+  {n:'Gaseosa Inca Kola 1L', p:16.00},
+];
+// Nombres ANÓNIMOS del dataset demo (no clientes reales).
+const NAMES = ['María Rodríguez','Carlos Vargas','Lucía Mendoza','Ana Castillo','Pedro Salas',
+  'Rosa Quispe','Jorge Ramos','Elena Díaz','Miguel Torres','Sofía Núñez','Luis Paredes','Carmen Flores'];
+const ADDRS = ['Calle Tacna 120','Av. Grau 450','Jr. Libertad 223','Urb. Los Cocos Mz B Lt 4',
+  'Av. Sánchez Cerro 980','Jr. Cusco 55','Av. Country 312','Calle Lima 78'];
+const PAYS = ['Yape','Plin','Tarjeta','Efectivo'];
+
+function money(n){ return 'S/ ' + n.toFixed(2); }
+
+// ── Generación determinista de ~1 mes de pedidos ──
+function buildOrders(){
+  _seed = 20260620;
+  const out = []; let id = 1;
+  for (let day = 1; day <= 20; day++){
+    const n = (day === 20) ? 7 : (day === 19 ? 5 : ri(2,4));
+    for (let k = 0; k < n; k++){
+      const hour = ri(11, 22), min = ri(0, 59);
+      const created = new Date(2026, 5, day, hour, min, 0);
+      const channel = rnd() < 0.62 ? 'delivery' : 'pickup';
+      const nItems = ri(1,3); const items = [];
+      for (let j=0;j<nItems;j++){ const m = pick(MENU); items.push({qty: ri(1,2), name:m.n, price:m.p}); }
+      const sub = items.reduce((s,it)=>s+it.qty*it.price,0);
+      const fee = channel==='delivery' ? pick([5,6,7,8]) : 0;
+      // Estado según el día respecto a "hoy" (20 jun).
+      let status;
+      if (day < 19) status = rnd() < 0.06 ? 'cancelled' : 'delivered';
+      else if (day === 19) status = rnd() < 0.85 ? 'delivered' : 'dispatched';
+      else { // hoy: mezcla activa
+        status = ['confirmed','confirmed','preparing','ready','dispatched','delivered','confirmed'][k] || 'confirmed';
+      }
+      out.push({
+        id: 'D'+String(id++).padStart(3,'0'),
+        created, status, channel,
+        items, total: sub + fee, fee,
+        pay: pick(PAYS),
+        name: pick(NAMES),
+        phone: '9•• ••• •••',
+        addr: channel==='delivery' ? pick(ADDRS) : null,
+      });
+    }
+  }
+  // más recientes primero
+  out.sort((a,b)=> b.created - a.created);
+  return out;
+}
+
+let ORDERS = buildOrders();        // estado en memoria (se reinicia al recargar)
+let dateFilter = 'today';
+let statusFilter = 'active';
+
+const STATUS = {
+  confirmed:{label:'Nuevo',badge:'badge-confirmed',cls:'status-confirmed'},
+  preparing:{label:'Preparando',badge:'badge-preparing',cls:'status-preparing'},
+  ready:{label:'Listo',badge:'badge-ready',cls:'status-ready'},
+  dispatched:{label:'En camino',badge:'badge-dispatched',cls:'status-dispatched'},
+  delivered:{label:'Entregado',badge:'badge-delivered',cls:'status-delivered'},
+  cancelled:{label:'Cancelado',badge:'badge-delivered',cls:'status-cancelled'},
+};
+// Botón de avance local por estado
+const NEXT = {
+  confirmed:{to:'preparing',label:'Preparar',cls:'btn-prepare'},
+  preparing:{to:'ready',label:'Listo',cls:'btn-ready'},
+  ready:{to:'dispatched',label:'Despachar',cls:'btn-dispatch'},
+  dispatched:{to:'delivered',label:'Entregar',cls:'btn-deliver'},
+};
+
+function sameDay(d, day){ return d.getMonth()===5 && d.getDate()===day; }
+function inDateFilter(o){
+  if (dateFilter==='month') return true;
+  if (dateFilter==='today') return sameDay(o.created,20);
+  if (dateFilter==='yesterday') return sameDay(o.created,19);
+  if (dateFilter==='week') return o.created.getDate() >= 14; // últimos 7 días
+  return true;
+}
+function inStatusFilter(o){
+  if (statusFilter==='all') return true;
+  if (statusFilter==='active') return ['confirmed','preparing','ready','dispatched'].includes(o.status);
+  return o.status === statusFilter;
+}
+function timeAgo(d){
+  const min = Math.round((DEMO_NOW - d)/60000);
+  if (min < 1) return 'ahora';
+  if (min < 60) return min+'m';
+  const h = Math.floor(min/60); if (h < 24) return h+'h '+(min%60)+'m';
+  return Math.floor(h/24)+'d';
+}
+function fmtTime(d){
+  let h=d.getHours(), m=String(d.getMinutes()).padStart(2,'0');
+  const ap = h<12?'a.m.':'p.m.'; h = h%12||12;
+  return h+':'+m+' '+ap;
+}
+
+function render(){
+  const byDate = ORDERS.filter(inDateFilter);
+
+  // Stats (sobre el filtro de fecha)
+  const c = s => byDate.filter(o=>o.status===s).length;
+  const ventas = byDate.filter(o=>o.status!=='cancelled').reduce((s,o)=>s+o.total,0);
+  const totalPed = byDate.filter(o=>o.status!=='cancelled').length;
+  const stats = [
+    {v:c('confirmed'),l:'Nuevos',col:'var(--confirmed)'},
+    {v:c('preparing'),l:'Preparando',col:'var(--preparing)'},
+    {v:c('ready')+c('dispatched'),l:'Listos/Camino',col:'var(--ready)'},
+    {v:c('delivered'),l:'Entregados',col:'var(--dispatched)'},
+    {v:money(ventas),l:'Ventas',col:'var(--accent)'},
+    {v:totalPed,l:'Total pedidos',col:'var(--text)'},
+  ];
+  document.getElementById('statsBar').innerHTML = stats.map(s=>
+    `<div class="stat-card"><div class="stat-value" style="color:${s.col}">${s.v}</div><div class="stat-label">${s.l}</div></div>`
+  ).join('');
+
+  // Date bar
+  const dates = [['today','Hoy'],['yesterday','Ayer'],['week','Semana'],['month','Mes']];
+  document.getElementById('dateBar').innerHTML = dates.map(([k,lab])=>
+    `<button class="date-btn ${dateFilter===k?'active':''}" data-date="${k}">${lab}</button>`
+  ).join('') + `<span style="font-size:11px;color:var(--text-dim);margin-left:auto">Junio 2026 · datos de demostración</span>`;
+
+  // Filter bar (estado) con contadores sobre el filtro de fecha
+  const filters = [
+    ['active','Activos'],['confirmed','Nuevos'],['preparing','Preparando'],
+    ['ready','Listos'],['dispatched','En camino'],['delivered','Entregados'],['all','Todos'],
+  ];
+  const cnt = f => { const s=statusFilter; statusFilter=f; const n=byDate.filter(inStatusFilter).length; statusFilter=s; return n; };
+  document.getElementById('filterBar').innerHTML = filters.map(([k,lab])=>
+    `<button class="filter-btn ${statusFilter===k?'active':''}" data-filter="${k}">${lab}<span class="filter-count">${cnt(k)}</span></button>`
+  ).join('');
+
+  // Orders
+  const list = byDate.filter(inStatusFilter);
+  const cont = document.getElementById('orders');
+  if (!list.length){
+    cont.innerHTML = `<div class="empty-state"><div class="empty-icon">🍗</div><div>No hay pedidos en este filtro.</div></div>`;
+    return;
+  }
+  cont.innerHTML = list.map(o=>{
+    const st = STATUS[o.status];
+    const items = o.items.map(it=>`<div class="card-item"><span><span class="card-item-q">${it.qty}×</span> ${it.name}</span><span>${money(it.qty*it.price)}</span></div>`).join('');
+    const nx = NEXT[o.status];
+    const actions = nx
+      ? `<div class="card-actions"><button class="action-btn ${nx.cls}" data-adv="${o.id}">${nx.label}</button></div>`
+      : `<div class="card-done">${o.status==='delivered'?'✓ Entregado':'Cancelado'}</div>`;
+    const footer = `<div class="card-footer">
+        <div class="card-customer-name">${o.name} <span class="card-customer-phone">· ${o.phone}</span></div>
+        ${o.addr?`<div class="card-address">📍 ${o.addr}</div>`:''}
+      </div>`;
+    return `<div class="order-card ${st.cls}">
+      <div class="card-top">
+        <div class="card-top-left">
+          <span class="order-status-badge ${st.badge}">${st.label}</span>
+          <span class="order-type-badge ${o.channel==='delivery'?'type-delivery':'type-pickup'}">${o.channel==='delivery'?'🛵 Delivery':'🏠 Recojo'}</span>
+        </div>
+        <span class="card-time-ago">${timeAgo(o.created)} · ${fmtTime(o.created)}</span>
+      </div>
+      <div class="card-body">
+        ${items}
+        <div class="card-total"><span>Total</span><span class="card-total-amount">${money(o.total)}</span></div>
+        <span class="card-payment">💳 ${o.pay}</span>
+      </div>
+      ${footer}
+      ${actions}
+    </div>`;
+  }).join('');
+}
+
+// ── Eventos (delegados) ──
+document.getElementById('dateBar').addEventListener('click', e=>{
+  const b = e.target.closest('[data-date]'); if(!b) return;
+  dateFilter = b.dataset.date; render();
+});
+document.getElementById('filterBar').addEventListener('click', e=>{
+  const b = e.target.closest('[data-filter]'); if(!b) return;
+  statusFilter = b.dataset.filter; render();
+});
+document.getElementById('orders').addEventListener('click', e=>{
+  const b = e.target.closest('[data-adv]'); if(!b) return;
+  const o = ORDERS.find(x=>x.id===b.dataset.adv);
+  if (o && NEXT[o.status]) o.status = NEXT[o.status].to; // cambio SOLO en memoria
+  render();
+});
+
+// ── Login cosmético (client-side, sin red) ──
+function tryLogin(){
+  const v = document.getElementById('pin').value.trim();
+  if (v === '1111'){
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    render();
+  } else {
+    document.getElementById('err').textContent = 'Clave incorrecta. Pista: 1111';
+  }
+}
+document.getElementById('enter').addEventListener('click', tryLogin);
+document.getElementById('pin').addEventListener('keydown', e=>{ if(e.key==='Enter') tryLogin(); });
+window.addEventListener('DOMContentLoaded', ()=>document.getElementById('pin').focus());
+</script>
+</body>
+</html>
