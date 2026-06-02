@@ -9,7 +9,7 @@
   :root{
     --bg:#08080a; --surface:#111114; --surface-2:#1a1a1e; --border:#252529;
     --text:#e8e8ec; --text-muted:#7a7a84; --text-dim:#55555e;
-    --accent:#f97316; --accent-glow:rgba(249,115,22,.12);
+    --accent:#f97316; --accent-glow:rgba(249,115,22,.12); --accent-border:rgba(249,115,22,.3);
     --confirmed:#f59e0b; --confirmed-bg:rgba(245,158,11,.07); --confirmed-border:rgba(245,158,11,.22);
     --preparing:#3b82f6; --preparing-bg:rgba(59,130,246,.07); --preparing-border:rgba(59,130,246,.22);
     --ready:#10b981; --ready-bg:rgba(16,185,129,.07); --ready-border:rgba(16,185,129,.22);
@@ -25,11 +25,12 @@
   .login-logo{font-family:'Space Mono',monospace;font-size:13px;color:var(--accent);letter-spacing:3px;text-transform:uppercase;margin-bottom:6px}
   .login-name{font-size:26px;font-weight:700;margin-bottom:6px}
   .login-sub{font-size:13px;color:var(--text-muted);margin-bottom:26px}
-  .login-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;width:100%;max-width:340px;text-align:center}
-  .login-banner{background:var(--accent-glow);border:1px solid var(--accent-border,rgba(249,115,22,.3));border-radius:8px;padding:8px 12px;font-size:12px;color:var(--accent);font-weight:600;margin-bottom:16px}
+  .login-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;width:100%;max-width:330px;text-align:center}
   .login-input{width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:12px;color:var(--text);font-size:18px;text-align:center;letter-spacing:6px;font-family:'Space Mono',monospace}
   .login-input:focus{outline:none;border-color:var(--accent)}
-  .login-btn{width:100%;margin-top:12px;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:.5px}
+  .login-hint{font-size:11px;color:var(--text-dim);margin-top:8px;letter-spacing:.3px}
+  .login-hint b{color:var(--text-muted);font-weight:600}
+  .login-btn{width:100%;margin-top:16px;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:.5px}
   .login-btn:hover{filter:brightness(1.08)}
   .login-err{color:var(--cancelled);font-size:12px;margin-top:10px;min-height:16px}
 
@@ -41,12 +42,19 @@
   .live-dot{width:7px;height:7px;background:#10b981;border-radius:50%;animation:pulse 2s infinite}
   @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(16,185,129,.4)}50%{opacity:.8;box-shadow:0 0 0 5px rgba(16,185,129,0)}}
   .live-text{font-size:11px;color:#10b981;font-weight:500}
-  .demo-pill{font-size:10px;color:var(--accent);border:1px solid var(--accent-border,rgba(249,115,22,.3));background:var(--accent-glow);border-radius:5px;padding:3px 8px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+  .demo-pill{font-size:10px;color:var(--accent);border:1px solid var(--accent-border);background:var(--accent-glow);border-radius:5px;padding:3px 8px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
 
   .date-bar{display:flex;align-items:center;gap:8px;padding:10px 20px;border-bottom:1px solid var(--border);background:var(--surface);flex-wrap:wrap}
   .date-btn{background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:5px 12px;color:var(--text-muted);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s}
   .date-btn:hover{border-color:var(--text-muted);color:var(--text)}
   .date-btn.active{background:var(--accent-glow);border-color:var(--accent);color:var(--accent)}
+  .day-nav{display:flex;align-items:center;gap:6px;margin-left:4px}
+  .day-arrow{background:var(--surface-2);border:1px solid var(--border);border-radius:6px;width:28px;height:28px;color:var(--text-muted);font-size:14px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center}
+  .day-arrow:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+  .day-arrow:disabled{opacity:.35;cursor:not-allowed}
+  .date-input{background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text);font-size:12px;font-family:inherit}
+  .date-input::-webkit-calendar-picker-indicator{filter:invert(.7)}
+  .date-note{font-size:11px;color:var(--text-dim);margin-left:auto}
 
   .stats-bar{display:flex;gap:8px;padding:10px 20px;border-bottom:1px solid var(--border);overflow-x:auto}
   .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 14px;min-width:108px;flex-shrink:0}
@@ -68,11 +76,11 @@
   .order-card.status-preparing{border-left:3px solid var(--preparing)}
   .order-card.status-ready{border-left:3px solid var(--ready)}
   .order-card.status-dispatched{border-left:3px solid var(--dispatched)}
-  .order-card.status-delivered{border-left:3px solid var(--delivered);opacity:.55}
-  .order-card.status-cancelled{border-left:3px solid var(--cancelled);opacity:.4}
+  .order-card.status-delivered{border-left:3px solid var(--delivered);opacity:.6}
 
   .card-top{padding:8px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
   .card-top-left{display:flex;align-items:center;gap:6px}
+  .card-top-right{display:flex;align-items:center;gap:8px}
   .order-status-badge{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;padding:3px 8px;border-radius:4px}
   .badge-confirmed{background:var(--confirmed-bg);color:var(--confirmed);border:1px solid var(--confirmed-border)}
   .badge-preparing{background:var(--preparing-bg);color:var(--preparing);border:1px solid var(--preparing-border)}
@@ -83,6 +91,8 @@
   .type-delivery{background:rgba(59,130,246,.1);color:#60a5fa}
   .type-pickup{background:rgba(16,185,129,.1);color:#34d399}
   .card-time-ago{font-size:10px;color:var(--text-dim);font-family:'Space Mono',monospace}
+  .card-x{background:transparent;border:1px solid var(--border);color:var(--text-dim);width:20px;height:20px;border-radius:5px;font-size:11px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+  .card-x:hover{border-color:var(--cancelled);color:var(--cancelled)}
 
   .card-body{padding:8px 10px}
   .card-item{display:flex;justify-content:space-between;padding:2px 0;font-size:13px}
@@ -111,6 +121,7 @@
   @media(max-width:768px){
     .orders-container{grid-template-columns:1fr;padding:8px 12px 24px}
     .header,.stats-bar,.filter-bar,.date-bar{padding-left:12px;padding-right:12px}
+    .date-note{display:none}
   }
 </style>
 </head>
@@ -122,8 +133,8 @@
   <div class="login-name">La Braza</div>
   <div class="login-sub">Panel de Pedidos</div>
   <div class="login-card">
-    <div class="login-banner">Demo · clave de acceso: 1111</div>
     <input class="login-input" id="pin" type="password" inputmode="numeric" maxlength="8" placeholder="••••" autocomplete="off" />
+    <div class="login-hint">Demo · Clave: <b>1111</b></div>
     <button class="login-btn" id="enter">Entrar</button>
     <div class="login-err" id="err"></div>
   </div>
@@ -153,8 +164,9 @@
    Al recargar, vuelve al mes fijo (los datos se regeneran igual).
    ════════════════════════════════════════════════════════════ */
 
-// "Ahora" fijo del demo (no usa la fecha real del navegador para los cálculos).
-const DEMO_NOW = new Date(2026, 5, 20, 14, 32, 0); // 20 jun 2026, 2:32 p.m.
+// "Ahora" fijo del demo (no usa la fecha real del navegador).
+const TODAY = 20;                               // 20 jun 2026 = hoy
+const DEMO_NOW = new Date(2026, 5, TODAY, 14, 32, 0);
 
 // PRNG con semilla fija → mismo mes en cada recarga.
 let _seed = 20260620;
@@ -172,54 +184,56 @@ const MENU = [
   {n:'Mollejitas', p:15.00},
   {n:'Gaseosa Inca Kola 1L', p:16.00},
 ];
-// Nombres ANÓNIMOS del dataset demo (no clientes reales).
 const NAMES = ['María Rodríguez','Carlos Vargas','Lucía Mendoza','Ana Castillo','Pedro Salas',
   'Rosa Quispe','Jorge Ramos','Elena Díaz','Miguel Torres','Sofía Núñez','Luis Paredes','Carmen Flores'];
 const ADDRS = ['Calle Tacna 120','Av. Grau 450','Jr. Libertad 223','Urb. Los Cocos Mz B Lt 4',
   'Av. Sánchez Cerro 980','Jr. Cusco 55','Av. Country 312','Calle Lima 78'];
 const PAYS = ['Yape','Plin','Tarjeta','Efectivo'];
+const money = n => 'S/ ' + n.toFixed(2);
 
-function money(n){ return 'S/ ' + n.toFixed(2); }
+// Estados de HOY: mezcla realista (NO todos entregados).
+// varios NUEVO · algunos PREPARANDO · algunos LISTO · algunos EN CAMINO · pocos ENTREGADO
+const TODAY_STATUSES = ['confirmed','confirmed','confirmed','confirmed','preparing','preparing',
+  'ready','ready','dispatched','dispatched','delivered','delivered'];
 
-// ── Generación determinista de ~1 mes de pedidos ──
+function makeOrder(id, day, status, hour){
+  const min = ri(0,59);
+  const created = new Date(2026, 5, day, hour, min, 0);
+  const channel = rnd() < 0.62 ? 'delivery' : 'pickup';
+  const nItems = ri(1,3); const items = [];
+  for (let j=0;j<nItems;j++){ const m = pick(MENU); items.push({qty: ri(1,2), name:m.n, price:m.p}); }
+  const sub = items.reduce((s,it)=>s+it.qty*it.price,0);
+  const fee = channel==='delivery' ? pick([5,6,7,8]) : 0;
+  return {
+    id:'D'+String(id).padStart(3,'0'), created, status, channel,
+    items, total: sub+fee, fee, pay: pick(PAYS),
+    name: pick(NAMES), phone:'9•• ••• •••',
+    addr: channel==='delivery' ? pick(ADDRS) : null,
+  };
+}
+
+// ── Mes fijo determinista ──
 function buildOrders(){
   _seed = 20260620;
   const out = []; let id = 1;
-  for (let day = 1; day <= 20; day++){
-    const n = (day === 20) ? 7 : (day === 19 ? 5 : ri(2,4));
-    for (let k = 0; k < n; k++){
-      const hour = ri(11, 22), min = ri(0, 59);
-      const created = new Date(2026, 5, day, hour, min, 0);
-      const channel = rnd() < 0.62 ? 'delivery' : 'pickup';
-      const nItems = ri(1,3); const items = [];
-      for (let j=0;j<nItems;j++){ const m = pick(MENU); items.push({qty: ri(1,2), name:m.n, price:m.p}); }
-      const sub = items.reduce((s,it)=>s+it.qty*it.price,0);
-      const fee = channel==='delivery' ? pick([5,6,7,8]) : 0;
-      // Estado según el día respecto a "hoy" (20 jun).
-      let status;
-      if (day < 19) status = rnd() < 0.06 ? 'cancelled' : 'delivered';
-      else if (day === 19) status = rnd() < 0.85 ? 'delivered' : 'dispatched';
-      else { // hoy: mezcla activa
-        status = ['confirmed','confirmed','preparing','ready','dispatched','delivered','confirmed'][k] || 'confirmed';
-      }
-      out.push({
-        id: 'D'+String(id++).padStart(3,'0'),
-        created, status, channel,
-        items, total: sub + fee, fee,
-        pay: pick(PAYS),
-        name: pick(NAMES),
-        phone: '9•• ••• •••',
-        addr: channel==='delivery' ? pick(ADDRS) : null,
-      });
-    }
+  // Días pasados (1–19): TODOS entregados.
+  for (let day = 1; day <= TODAY-1; day++){
+    const n = ri(6,11);                          // volumen realista por día
+    for (let k=0;k<n;k++) out.push(makeOrder(id++, day, 'delivered', ri(11,22)));
   }
-  // más recientes primero
-  out.sort((a,b)=> b.created - a.created);
+  // HOY (20): mezcla activa, repartida durante el día.
+  TODAY_STATUSES.forEach((st, i) => {
+    // los activos más recientes (tarde), los entregados más temprano
+    const hour = st==='delivered' ? ri(11,13) : ri(13,14);
+    out.push(makeOrder(id++, TODAY, st, hour));
+  });
+  out.sort((a,b)=> b.created - a.created);        // recientes primero
   return out;
 }
 
 let ORDERS = buildOrders();        // estado en memoria (se reinicia al recargar)
-let dateFilter = 'today';
+let view = 'day';                  // 'day' | 'week' | 'month'
+let day = TODAY;                   // día seleccionado (modo 'day')
 let statusFilter = 'active';
 
 const STATUS = {
@@ -228,9 +242,7 @@ const STATUS = {
   ready:{label:'Listo',badge:'badge-ready',cls:'status-ready'},
   dispatched:{label:'En camino',badge:'badge-dispatched',cls:'status-dispatched'},
   delivered:{label:'Entregado',badge:'badge-delivered',cls:'status-delivered'},
-  cancelled:{label:'Cancelado',badge:'badge-delivered',cls:'status-cancelled'},
 };
-// Botón de avance local por estado
 const NEXT = {
   confirmed:{to:'preparing',label:'Preparar',cls:'btn-prepare'},
   preparing:{to:'ready',label:'Listo',cls:'btn-ready'},
@@ -238,13 +250,10 @@ const NEXT = {
   dispatched:{to:'delivered',label:'Entregar',cls:'btn-deliver'},
 };
 
-function sameDay(d, day){ return d.getMonth()===5 && d.getDate()===day; }
 function inDateFilter(o){
-  if (dateFilter==='month') return true;
-  if (dateFilter==='today') return sameDay(o.created,20);
-  if (dateFilter==='yesterday') return sameDay(o.created,19);
-  if (dateFilter==='week') return o.created.getDate() >= 14; // últimos 7 días
-  return true;
+  if (view==='month') return true;
+  if (view==='week') return o.created.getDate() >= (TODAY-6); // últimos 7 días
+  return o.created.getDate() === day;                          // modo 'day'
 }
 function inStatusFilter(o){
   if (statusFilter==='all') return true;
@@ -255,51 +264,66 @@ function timeAgo(d){
   const min = Math.round((DEMO_NOW - d)/60000);
   if (min < 1) return 'ahora';
   if (min < 60) return min+'m';
-  const h = Math.floor(min/60); if (h < 24) return h+'h '+(min%60)+'m';
+  const h = Math.floor(min/60); if (h < 24) return h+'h';
   return Math.floor(h/24)+'d';
 }
-function fmtTime(d){
-  let h=d.getHours(), m=String(d.getMinutes()).padStart(2,'0');
-  const ap = h<12?'a.m.':'p.m.'; h = h%12||12;
-  return h+':'+m+' '+ap;
+function fmtTime(d){ let h=d.getHours(),m=String(d.getMinutes()).padStart(2,'0'); const ap=h<12?'a.m.':'p.m.'; h=h%12||12; return h+':'+m+' '+ap; }
+function ymd(d){ return '2026-06-'+String(d).padStart(2,'0'); }
+
+// Cambiar a un día concreto; en días pasados muestra 'Todos' (entregados), hoy 'Activos'.
+function goToDay(d){
+  day = Math.max(1, Math.min(TODAY, d));
+  view = 'day';
+  statusFilter = (day === TODAY) ? 'active' : 'all';
+  render();
 }
 
 function render(){
   const byDate = ORDERS.filter(inDateFilter);
 
-  // Stats (sobre el filtro de fecha)
+  // ── Date bar ──
+  const ranges = [['day-today','Hoy'],['day-yest','Ayer'],['week','Semana'],['month','Mes']];
+  const isActive = k =>
+    (k==='day-today' && view==='day' && day===TODAY) ||
+    (k==='day-yest'  && view==='day' && day===TODAY-1) ||
+    (k==='week' && view==='week') || (k==='month' && view==='month');
+  let label;
+  if (view==='month') label='Junio 2026 · mes completo';
+  else if (view==='week') label='Últimos 7 días';
+  else label = (day===TODAY?'Hoy':day===TODAY-1?'Ayer':'') + ` ${day} jun 2026`;
+  document.getElementById('dateBar').innerHTML =
+    ranges.map(([k,l])=>`<button class="date-btn ${isActive(k)?'active':''}" data-range="${k}">${l}</button>`).join('') +
+    `<span class="day-nav">
+       <button class="day-arrow" id="prevDay" ${day<=1?'disabled':''} title="Día anterior">‹</button>
+       <input class="date-input" id="dayPick" type="date" min="2026-06-01" max="${ymd(TODAY)}" value="${ymd(day)}">
+       <button class="day-arrow" id="nextDay" ${(view==='day'&&day>=TODAY)?'disabled':''} title="Día siguiente">›</button>
+     </span>
+     <span class="date-note">${label} · datos de demostración</span>`;
+
+  // ── Stats (reflejan el filtro de fecha) ──
   const c = s => byDate.filter(o=>o.status===s).length;
-  const ventas = byDate.filter(o=>o.status!=='cancelled').reduce((s,o)=>s+o.total,0);
-  const totalPed = byDate.filter(o=>o.status!=='cancelled').length;
+  const ventas = byDate.reduce((s,o)=>s+o.total,0);
   const stats = [
     {v:c('confirmed'),l:'Nuevos',col:'var(--confirmed)'},
     {v:c('preparing'),l:'Preparando',col:'var(--preparing)'},
     {v:c('ready')+c('dispatched'),l:'Listos/Camino',col:'var(--ready)'},
     {v:c('delivered'),l:'Entregados',col:'var(--dispatched)'},
     {v:money(ventas),l:'Ventas',col:'var(--accent)'},
-    {v:totalPed,l:'Total pedidos',col:'var(--text)'},
+    {v:byDate.length,l:'Total pedidos',col:'var(--text)'},
   ];
   document.getElementById('statsBar').innerHTML = stats.map(s=>
     `<div class="stat-card"><div class="stat-value" style="color:${s.col}">${s.v}</div><div class="stat-label">${s.l}</div></div>`
   ).join('');
 
-  // Date bar
-  const dates = [['today','Hoy'],['yesterday','Ayer'],['week','Semana'],['month','Mes']];
-  document.getElementById('dateBar').innerHTML = dates.map(([k,lab])=>
-    `<button class="date-btn ${dateFilter===k?'active':''}" data-date="${k}">${lab}</button>`
-  ).join('') + `<span style="font-size:11px;color:var(--text-dim);margin-left:auto">Junio 2026 · datos de demostración</span>`;
-
-  // Filter bar (estado) con contadores sobre el filtro de fecha
-  const filters = [
-    ['active','Activos'],['confirmed','Nuevos'],['preparing','Preparando'],
-    ['ready','Listos'],['dispatched','En camino'],['delivered','Entregados'],['all','Todos'],
-  ];
+  // ── Filter bar ──
+  const filters = [['active','Activos'],['confirmed','Nuevos'],['preparing','Preparando'],
+    ['ready','Listos'],['dispatched','En camino'],['delivered','Entregados'],['all','Todos']];
   const cnt = f => { const s=statusFilter; statusFilter=f; const n=byDate.filter(inStatusFilter).length; statusFilter=s; return n; };
-  document.getElementById('filterBar').innerHTML = filters.map(([k,lab])=>
-    `<button class="filter-btn ${statusFilter===k?'active':''}" data-filter="${k}">${lab}<span class="filter-count">${cnt(k)}</span></button>`
+  document.getElementById('filterBar').innerHTML = filters.map(([k,l])=>
+    `<button class="filter-btn ${statusFilter===k?'active':''}" data-filter="${k}">${l}<span class="filter-count">${cnt(k)}</span></button>`
   ).join('');
 
-  // Orders
+  // ── Orders ──
   const list = byDate.filter(inStatusFilter);
   const cont = document.getElementById('orders');
   if (!list.length){
@@ -312,50 +336,66 @@ function render(){
     const nx = NEXT[o.status];
     const actions = nx
       ? `<div class="card-actions"><button class="action-btn ${nx.cls}" data-adv="${o.id}">${nx.label}</button></div>`
-      : `<div class="card-done">${o.status==='delivered'?'✓ Entregado':'Cancelado'}</div>`;
-    const footer = `<div class="card-footer">
-        <div class="card-customer-name">${o.name} <span class="card-customer-phone">· ${o.phone}</span></div>
-        ${o.addr?`<div class="card-address">📍 ${o.addr}</div>`:''}
-      </div>`;
+      : `<div class="card-done">✓ Entregado</div>`;
     return `<div class="order-card ${st.cls}">
       <div class="card-top">
         <div class="card-top-left">
           <span class="order-status-badge ${st.badge}">${st.label}</span>
           <span class="order-type-badge ${o.channel==='delivery'?'type-delivery':'type-pickup'}">${o.channel==='delivery'?'🛵 Delivery':'🏠 Recojo'}</span>
         </div>
-        <span class="card-time-ago">${timeAgo(o.created)} · ${fmtTime(o.created)}</span>
+        <div class="card-top-right">
+          <span class="card-time-ago">${timeAgo(o.created)} · ${fmtTime(o.created)}</span>
+          <button class="card-x" data-del="${o.id}" title="Quitar pedido" aria-label="Quitar pedido">✕</button>
+        </div>
       </div>
       <div class="card-body">
         ${items}
         <div class="card-total"><span>Total</span><span class="card-total-amount">${money(o.total)}</span></div>
         <span class="card-payment">💳 ${o.pay}</span>
       </div>
-      ${footer}
+      <div class="card-footer">
+        <div class="card-customer-name">${o.name} <span class="card-customer-phone">· ${o.phone}</span></div>
+        ${o.addr?`<div class="card-address">📍 ${o.addr}</div>`:''}
+      </div>
       ${actions}
     </div>`;
   }).join('');
 }
 
-// ── Eventos (delegados) ──
+// ── Eventos delegados ──
 document.getElementById('dateBar').addEventListener('click', e=>{
-  const b = e.target.closest('[data-date]'); if(!b) return;
-  dateFilter = b.dataset.date; render();
+  const r = e.target.closest('[data-range]');
+  if (r){
+    const k = r.dataset.range;
+    if (k==='day-today') goToDay(TODAY);
+    else if (k==='day-yest') goToDay(TODAY-1);
+    else if (k==='week'){ view='week'; statusFilter='all'; render(); }
+    else if (k==='month'){ view='month'; statusFilter='all'; render(); }
+    return;
+  }
+  if (e.target.id==='prevDay') return goToDay(day-1);
+  if (e.target.id==='nextDay') return goToDay(day+1);
+});
+document.getElementById('dateBar').addEventListener('change', e=>{
+  if (e.target.id==='dayPick'){
+    const d = parseInt(e.target.value.split('-')[2],10);
+    if (!isNaN(d)) goToDay(d);
+  }
 });
 document.getElementById('filterBar').addEventListener('click', e=>{
   const b = e.target.closest('[data-filter]'); if(!b) return;
   statusFilter = b.dataset.filter; render();
 });
 document.getElementById('orders').addEventListener('click', e=>{
-  const b = e.target.closest('[data-adv]'); if(!b) return;
-  const o = ORDERS.find(x=>x.id===b.dataset.adv);
-  if (o && NEXT[o.status]) o.status = NEXT[o.status].to; // cambio SOLO en memoria
-  render();
+  const adv = e.target.closest('[data-adv]');
+  if (adv){ const o = ORDERS.find(x=>x.id===adv.dataset.adv); if(o&&NEXT[o.status]) o.status = NEXT[o.status].to; return render(); }
+  const del = e.target.closest('[data-del]');
+  if (del){ ORDERS = ORDERS.filter(x=>x.id!==del.dataset.del); return render(); } // solo en pantalla; recarga restaura
 });
 
 // ── Login cosmético (client-side, sin red) ──
 function tryLogin(){
-  const v = document.getElementById('pin').value.trim();
-  if (v === '1111'){
+  if (document.getElementById('pin').value.trim() === '1111'){
     document.getElementById('login').style.display = 'none';
     document.getElementById('app').style.display = 'block';
     render();
