@@ -53,10 +53,10 @@ function Wide({ src, alt, onZoom, caption }: { src: string; alt: string; onZoom:
 }
 
 // ── Phone — tall screenshot in a device frame, zoomable ──
-function Phone({ src, alt, onZoom, caption }: { src: string; alt: string; onZoom: Zoom; caption?: string }) {
+function Phone({ src, alt, onZoom, caption, maxW = 'max-w-[330px]' }: { src: string; alt: string; onZoom: Zoom; caption?: string; maxW?: string }) {
   const [failed, setFailed] = useState(false);
   return (
-    <figure className="mx-auto w-full max-w-[330px]">
+    <figure className={`mx-auto w-full ${maxW}`}>
       {failed ? (
         <div className="flex aspect-[9/19] w-full items-center justify-center rounded-[2rem] border border-white/10 bg-panel text-sm text-white/30">{alt}</div>
       ) : (
@@ -233,7 +233,7 @@ export default function App() {
           <Reveal className="grid gap-8 md:grid-cols-[200px_1fr] md:gap-16">
             <h2 className="font-display text-sm font-semibold uppercase tracking-[0.18em] text-white/40">About</h2>
             <p className="max-w-3xl text-lg leading-relaxed text-white/75 md:text-xl">
-              Before AI, I spent 6+ years in hospitality and F&amp;B across the US and Colombia, then worked as a business data analyst (Python, BigQuery, and Data Studio (formerly Looker Studio)). That mix — real operations + data + AI automation — lets me understand a business problem and build the solution myself, forward-deployed and end to end. Today I build agentic workflows in production; I&apos;m heading toward autonomous multi-agent systems.
+              Before AI, I spent 6+ years in hospitality and F&amp;B across the US and Colombia, then worked as a business data analyst — Python, BigQuery, and Data Studio (formerly Looker Studio). That mix — real operations + data + AI automation — lets me understand a business problem and build the solution myself, forward-deployed and end to end. Today I build agentic workflows in production; I&apos;m heading toward autonomous multi-agent systems.
             </p>
           </Reveal>
         </section>
@@ -311,8 +311,8 @@ export default function App() {
                 <Wide src="/img/tio-toro/workflow.png" alt="Tío Toro — full 83-node back-office workflow" onZoom={zoom}
                   caption="One n8n workflow, 83 nodes — sales, expenses, cash register & multimodal input" />
                 <div className="grid grid-cols-1 justify-items-center gap-8 sm:grid-cols-2">
-                  <Phone src="/img/tio-toro/whatsapp-venta.png" alt="Tío Toro — sale logged in natural language" onZoom={zoom} caption="Logging a sale in natural language" />
-                  <Phone src="/img/tio-toro/whatsapp-gasto.png" alt="Tío Toro — expense from a receipt photo" onZoom={zoom} caption="Expense from a receipt photo — Gemini Vision" />
+                  <Phone src="/img/tio-toro/whatsapp-venta.png" alt="Tío Toro — sale logged in natural language" onZoom={zoom} caption="Logging a sale in natural language" maxW="max-w-[300px]" />
+                  <Phone src="/img/tio-toro/whatsapp-gasto.png" alt="Tío Toro — expense from a receipt photo" onZoom={zoom} caption="Expense from a receipt photo — Gemini Vision" maxW="max-w-[300px]" />
                 </div>
               </div>
             </ProjectCard>
