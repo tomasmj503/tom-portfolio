@@ -15,7 +15,7 @@ function Reveal({
     const el = ref.current; if (!el) return;
     const obs = new IntersectionObserver(
       (entries) => entries.forEach((e) => { if (e.isIntersecting) { setVisible(true); obs.unobserve(e.target); } }),
-      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' },
+      { threshold: 0.08, rootMargin: '0px 0px -40px 0px' },
     );
     obs.observe(el);
     return () => obs.disconnect();
@@ -30,16 +30,10 @@ function Reveal({
 
 type Zoom = (src: string, alt: string) => void;
 
-// ─────────────────────────────────────────────────────────────
-//  Caption
-// ─────────────────────────────────────────────────────────────
-function Caption({ children }: { children: React.ReactNode }) {
-  return <p className="mt-2 text-center text-xs text-white/40">{children}</p>;
-}
+const Caption = ({ children }: { children: React.ReactNode }) =>
+  <p className="mt-2 text-center text-xs text-white/40">{children}</p>;
 
-// ─────────────────────────────────────────────────────────────
-//  Wide — horizontal media (workflows, store), object-contain, zoomable
-// ─────────────────────────────────────────────────────────────
+// ── Wide — horizontal media (workflows, store), object-contain, zoomable ──
 function Wide({ src, alt, onZoom, caption }: { src: string; alt: string; onZoom: Zoom; caption?: string }) {
   const [failed, setFailed] = useState(false);
   return (
@@ -58,9 +52,7 @@ function Wide({ src, alt, onZoom, caption }: { src: string; alt: string; onZoom:
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-//  Phone — tall chat screenshot in a device frame, zoomable
-// ─────────────────────────────────────────────────────────────
+// ── Phone — tall screenshot in a device frame, zoomable ──
 function Phone({ src, alt, onZoom, caption }: { src: string; alt: string; onZoom: Zoom; caption?: string }) {
   const [failed, setFailed] = useState(false);
   return (
@@ -79,9 +71,7 @@ function Phone({ src, alt, onZoom, caption }: { src: string; alt: string; onZoom
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-//  BrowserFrame — window chrome wrapper (live iframe)
-// ─────────────────────────────────────────────────────────────
+// ── BrowserFrame — window chrome wrapper (live iframe) ──
 function BrowserFrame({ url, fullscreenHref, children }: { url: string; fullscreenHref: string; children: React.ReactNode }) {
   return (
     <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#08080a] shadow-2xl">
@@ -98,9 +88,7 @@ function BrowserFrame({ url, fullscreenHref, children }: { url: string; fullscre
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-//  Lightbox
-// ─────────────────────────────────────────────────────────────
+// ── Lightbox ──
 function Lightbox({ src, alt, onClose }: { src: string; alt: string; onClose: () => void }) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
@@ -119,9 +107,7 @@ function Lightbox({ src, alt, onClose }: { src: string; alt: string; onClose: ()
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-//  Atoms
-// ─────────────────────────────────────────────────────────────
+// ── Atoms ──
 const Chip = ({ children }: { children: React.ReactNode }) => (
   <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs font-medium text-white/60">{children}</span>
 );
@@ -134,9 +120,48 @@ const ArrowOut = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0"><path d="M7 17 17 7M9 7h8v8" /></svg>
 );
 
-// ─────────────────────────────────────────────────────────────
-//  Data
-// ─────────────────────────────────────────────────────────────
+// ── ProjectCard — problem + "What I built" bullet list + result + stack + media ──
+function ProjectCard({
+  name, tag, featured, problem, lead, bullets, note, result, stack, children,
+}: {
+  name: string; tag: string; featured?: boolean;
+  problem?: string; lead: string; bullets: string[]; note?: string; result: string; stack: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Reveal as="article">
+      <div className="mb-6 flex flex-wrap items-baseline gap-x-4 gap-y-1">
+        <h3 className="font-display text-2xl font-bold text-white sm:text-3xl">{name}</h3>
+        <span className="text-sm font-medium text-white/40">{tag}</span>
+        {featured && <span className="rounded-full border border-amber/30 bg-amber/10 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-amber">Live demo</span>}
+      </div>
+
+      <div className="max-w-3xl space-y-5">
+        {problem && (
+          <p className="leading-relaxed text-white/70"><span className="font-semibold text-white/90">The problem: </span>{problem}</p>
+        )}
+        <div>
+          <p className="leading-relaxed text-white/80"><span className="font-semibold text-white">What I built — </span>{lead}</p>
+          <ul className="mt-4 space-y-2.5">
+            {bullets.map((b) => (
+              <li key={b} className="flex gap-3 leading-relaxed text-white/70">
+                <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-amber/70" />
+                <span>{b}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        {note && <p className="text-sm text-white/45">{note}</p>}
+        <p className="leading-relaxed"><span className="font-semibold text-white/90">Result — </span><span className="text-white/90">{result}</span></p>
+        <p className="text-sm text-white/50">{stack}</p>
+      </div>
+
+      <div className="mt-12">{children}</div>
+    </Reveal>
+  );
+}
+
+// ── Data ──
 const HERO_STACK = ['n8n', 'WhatsApp Cloud API', 'Claude & Claude Code', 'Gemini', 'Supabase', 'Vercel', 'TypeScript'];
 const TOOLS = ['Claude / Claude Code', 'n8n', 'WhatsApp Cloud API', 'Telegram', 'Gemini Vision', 'GPT-4o mini', 'Google Maps', 'Supabase', 'Google Sheets', 'TypeScript', 'Vercel'];
 const EMAIL = 'tomas-mj@hotmail.com';
@@ -144,42 +169,6 @@ const LINKEDIN = 'https://www.linkedin.com/in/tomasemiliomunozdigital/';
 const GITHUB = 'https://github.com/tomasmj503';
 const DEMO_TIOTORO = 'https://jutilabs.com/demos/panel.html';
 const DEMO_LABRAZA = '/demos/labraza.html';
-
-// ─────────────────────────────────────────────────────────────
-//  Sub-components
-// ─────────────────────────────────────────────────────────────
-function ProjectHead({ name, tag, featured }: { name: string; tag: string; featured?: boolean }) {
-  return (
-    <div className="mb-6 flex flex-wrap items-baseline gap-x-4 gap-y-1">
-      <h3 className="font-display text-2xl font-bold text-white sm:text-3xl">{name}</h3>
-      <span className="text-sm font-medium text-white/40">{tag}</span>
-      {featured && <span className="rounded-full border border-amber/30 bg-amber/10 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-amber">Live demo</span>}
-    </div>
-  );
-}
-function Field({ label, children, strong }: { label: string; children: React.ReactNode; strong?: boolean }) {
-  return (
-    <div>
-      <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-white/35">{label}</div>
-      <p className={`leading-relaxed ${strong ? 'text-white/90' : 'text-white/70'}`}>{children}</p>
-    </div>
-  );
-}
-function Narrative({ problem, built, result, stack, cta }: {
-  problem: string; built: string; result: string; stack: string; cta?: { label: string; href: string };
-}) {
-  return (
-    <div className="grid max-w-5xl gap-6 sm:grid-cols-2">
-      <Field label="Problem">{problem}</Field>
-      <Field label="What I built">{built}</Field>
-      <Field label="Result" strong>{result}</Field>
-      <div className="flex flex-col items-start gap-4">
-        <div><div className="mb-1 text-xs font-semibold uppercase tracking-wider text-white/35">Stack</div><p className="text-sm leading-relaxed text-white/55">{stack}</p></div>
-        {cta && <a href={cta.href} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-xl bg-amber px-4 py-2.5 text-sm font-bold text-ink transition hover:bg-amber/90">{cta.label}</a>}
-      </div>
-    </div>
-  );
-}
 
 // ─────────────────────────────────────────────────────────────
 //  App
@@ -238,21 +227,30 @@ export default function App() {
         <section id="work" className="border-t border-white/10 py-16 md:py-24">
           <Reveal className="mb-14 md:mb-20">
             <Eyebrow>Selected work</Eyebrow>
-            <h2 className="font-display text-3xl font-bold tracking-tight text-white sm:text-4xl">Three systems, shipped to production.</h2>
+            <h2 className="font-display text-3xl font-bold tracking-tight text-white sm:text-4xl">Systems shipped to production.</h2>
           </Reveal>
 
           <div className="space-y-24 md:space-y-36">
             {/* ── LA BRAZA ── */}
-            <Reveal as="article">
-              <ProjectHead name="La Braza" tag="restaurant · Peru" featured />
-              <Narrative
-                problem="they were losing orders during rush hours, handling WhatsApp by hand on two phones."
-                built="a WhatsApp ordering bot (130+ nodes) that takes the full order on its own — menu, address, distance-based delivery fee with Google Maps, and payment — plus a real-time dashboard that alerts the kitchen the moment an order lands. A 4-layer image-classification router (Gemini Vision) reliably tells payment screenshots from expense photos."
-                stack="n8n · WhatsApp Cloud API · Gemini Vision · Google Maps · Supabase"
-                result="they stopped losing orders during rush hours — handling 100+ orders a day."
-                cta={{ label: '⤢ Pantalla completa', href: DEMO_LABRAZA }}
-              />
-              <div className="mt-12 space-y-10">
+            <ProjectCard
+              name="La Braza" tag="restaurant · Peru" featured
+              problem="at peak hours they were losing orders, taking WhatsApp by hand on two phones."
+              lead="a complete WhatsApp ordering system that runs the order flow on its own, plus a live dashboard for the kitchen. In plain terms, it does everything a person used to do by hand:"
+              bullets={[
+                'Takes the full order over WhatsApp on its own: shows the menu, builds the order, asks delivery or pickup, captures the address, calculates the delivery fee based on the real distance (Google Maps), takes the payment method, and confirms.',
+                'Reads the payment screenshot (Yape) and supplier invoices automatically (Gemini Vision) — and a smart image router tells a payment proof apart from an expense photo, so nothing gets misfiled.',
+                'Live kitchen dashboard: every new order appears instantly, with its status (new → preparing → ready → on the way → delivered).',
+                'Keeps the customer informed automatically ("being prepared", "on its way").',
+                'Cleans up abandoned or incomplete orders on its own, so the board stays accurate.',
+                'Notifies dispatch and logs every order to a shared sheet.',
+                'Two hours after delivery, automatically asks the customer for a Google review.',
+                'Sends the owner an automatic daily summary of the day.',
+              ]}
+              note="Built as a 5-part system (130+ steps), handling 100+ orders a day."
+              result="they stopped losing orders during rush hours."
+              stack="n8n · WhatsApp Cloud API · Gemini Vision · Google Maps · Supabase"
+            >
+              <div className="space-y-10">
                 <div>
                   <BrowserFrame url="panel.labraza.com · demo" fullscreenHref={DEMO_LABRAZA}>
                     <iframe src={DEMO_LABRAZA} title="La Braza — live orders dashboard (demo)" loading="lazy"
@@ -267,19 +265,27 @@ export default function App() {
                   <Phone src="/img/labraza/whatsapp-2.png" alt="La Braza — dispatch & post-sale chat" onZoom={zoom} caption="Dispatch, review request & promos — automated" />
                 </div>
               </div>
-            </Reveal>
+            </ProjectCard>
 
             {/* ── TÍO TORO ── */}
-            <Reveal as="article">
-              <ProjectHead name="Tío Toro" tag="restaurant · Bogotá" featured />
-              <Narrative
-                problem="the owner tracked sales, expenses and cash by hand on loose sheets — no time, no expensive POS."
-                built="a single WhatsApp assistant (83-node workflow) that runs the whole back office — logs expenses by text, audio or photo (Gemini Vision reads the receipts), tracks dine-in and delivery sales, and runs the full cash register (open, withdrawals, end-of-day reconciliation), all synced to Google Sheets. On top of the data, a live analytics dashboard."
-                stack="n8n · WhatsApp Cloud API · Gemini (text, vision, audio) · Google Sheets · Chart.js"
-                result="for the first time the owner has clear numbers — daily income, expenses and cash — with no notebooks and no manual data entry."
-                cta={{ label: '⤢ Pantalla completa', href: DEMO_TIOTORO }}
-              />
-              <div className="mt-12 space-y-10">
+            <ProjectCard
+              name="Tío Toro" tag="restaurant · Bogotá" featured
+              problem="the owner tracked sales, expenses and cash by hand on loose sheets — no time, no expensive POS."
+              lead="a single WhatsApp assistant that runs the whole back office. The team just chats with it, and it keeps the books:"
+              bullets={[
+                'Logs expenses three ways: by text, by voice note, or by photo of the invoice (Gemini Vision reads the invoice and pulls the amounts).',
+                "Records dine-in table sales — each table's order and total.",
+                'Records delivery sales.',
+                'Handles split payments (a bill paid in parts or by different methods).',
+                'Runs the full cash register: opening the till, cash withdrawals during the day, and end-of-day reconciliation (squaring the cash).',
+                'Syncs everything automatically to Google Sheets.',
+                'A live dashboard turns it all into clear numbers: daily income, expenses, and cash on hand.',
+              ]}
+              note="Built as a single 83-step workflow."
+              result="for the first time the owner knows exactly what the business makes each day — no notebooks, no manual data entry."
+              stack="n8n · WhatsApp Cloud API · Gemini (text, vision, audio) · Google Sheets"
+            >
+              <div className="space-y-10">
                 <div>
                   <BrowserFrame url="panel.jutilabs.com" fullscreenHref={DEMO_TIOTORO}>
                     <iframe src={DEMO_TIOTORO} title="Tío Toro — live analytics dashboard" loading="lazy"
@@ -294,30 +300,51 @@ export default function App() {
                   <Phone src="/img/tio-toro/whatsapp-gasto.png" alt="Tío Toro — expense from a receipt photo" onZoom={zoom} caption="Expense from a receipt photo — Gemini Vision" />
                 </div>
               </div>
-            </Reveal>
+            </ProjectCard>
 
-            {/* ── DUENDES ── */}
-            <Reveal as="article">
-              <ProjectHead name="Duendes Perú" tag="e-commerce" />
-              <Narrative
-                problem="a handmade-goods brand needed an online store and a way to manage a growing catalog without touching code."
-                built="a custom Shopify storefront with WhatsApp checkout, plus a Telegram bot that uploads, activates and manages the whole catalog through the Shopify Admin API. I used GPT-4o mini to read each product photo and auto-write its description, and Claude Code to push storefront changes straight to the live store."
-                stack="Shopify Admin API · Telegram · GPT-4o mini · Claude Code"
-                result="they publish and manage their catalog in minutes, without touching code."
-              />
-              <div className="mt-12 grid gap-8 lg:grid-cols-2">
+            {/* ── DUENDES PERÚ ── */}
+            <ProjectCard
+              name="Duendes Perú" tag="e-commerce"
+              problem="a handmade-goods brand needed an online store and a way to manage a growing catalog without touching code."
+              lead="a custom online store plus a Telegram bot that runs the whole catalog from a chat:"
+              bullets={[
+                'Custom Shopify storefront, with checkout through WhatsApp.',
+                'A Telegram bot that manages the catalog end to end: add a product, edit its price or stock, activate or deactivate it, and list or search what\'s in the store.',
+                'Mark an item as "sold outside the store" so stock stays accurate.',
+                'Automatic sale notifications — the bot tells the owner the moment something sells (via webhook).',
+                'Turns a product photo into a finished listing: GPT-4o mini reads each photo and auto-writes its description.',
+                'I also used Claude Code to push changes straight to the live store.',
+              ]}
+              result="they publish and manage their whole catalog in minutes, from their phone, without touching code."
+              stack="Shopify Admin API · Telegram · GPT-4o mini · Claude Code"
+            >
+              <div className="grid items-start gap-8 lg:grid-cols-2">
                 <Wide src="/img/duendes/store.png" alt="Duendes Perú — custom Shopify storefront" onZoom={zoom} caption="Custom Shopify storefront, built with Claude Code" />
-                <figure>
+                <figure className="mx-auto w-full max-w-[640px]">
                   <div className="overflow-hidden rounded-xl border border-white/10 bg-panel p-2">
-                    <video controls playsInline preload="metadata" className="mx-auto w-full rounded-md"
-                      poster="/img/duendes/store.png">
+                    <video controls playsInline preload="metadata" className="block aspect-video w-full rounded-md bg-black object-contain">
                       <source src="/media/duendesperu.mp4" type="video/mp4" />
                     </video>
                   </div>
                   <Caption>Telegram catalog bot — product live in under a minute</Caption>
                 </figure>
               </div>
-            </Reveal>
+            </ProjectCard>
+
+            {/* ── ORÁCULO DIARIO ── */}
+            <ProjectCard
+              name="Oráculo Diario" tag="automated daily content · same client"
+              lead="an automated daily message the brand sends its community every morning on Telegram, generated and delivered without anyone lifting a finger:"
+              bullets={[
+                'Two scheduled automations: one prepares the content at 3am, another sends it at 9am.',
+                'Generates a personalized daily reading using AI (Gemini) on top of a structured data table.',
+                'Delivers it automatically to the audience on Telegram, every day.',
+              ]}
+              result="a hands-off daily touchpoint with the community — content that used to be manual now runs on schedule, on its own."
+              stack="n8n · Gemini · Telegram"
+            >
+              <Phone src="/img/oraculo/telegram.png" alt="Oráculo Diario — daily Telegram message" onZoom={zoom} caption="The daily Telegram message, delivered automatically every morning" />
+            </ProjectCard>
           </div>
         </section>
 
@@ -336,9 +363,6 @@ export default function App() {
           <Reveal>
             <Eyebrow>Contact</Eyebrow>
             <p className="max-w-2xl text-xl font-medium leading-snug text-white sm:text-2xl">
-              I&apos;m open to roles in AI automation — remote or hybrid.
-            </p>
-            <p className="mt-3 max-w-2xl text-white/60">
               The fastest way to reach me is email or LinkedIn. I usually reply the same day.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
